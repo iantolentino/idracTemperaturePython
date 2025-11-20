@@ -1,0 +1,558 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>iDRAC Temperature Monitor</title>
+    <style>
+        :root {
+            --primary: #2c3e50;
+            --secondary: #3498db;
+            --success: #27ae60;
+            --warning: #f39c12;
+            --danger: #e74c3c;
+            --light: #ecf0f1;
+            --dark: #34495e;
+        }
+        
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+        
+        body {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+        
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+        
+        .header {
+            background: var(--primary);
+            color: white;
+            padding: 25px 30px;
+            border-radius: 15px 15px 0 0;
+            text-align: center;
+        }
+        
+        .header h1 {
+            font-size: 32px;
+            margin-bottom: 10px;
+        }
+        
+        .content {
+            background: white;
+            padding: 30px;
+            border-radius: 0 0 15px 15px;
+            box-shadow: 0 15px 30px rgba(0, 0, 0, 0.2);
+        }
+        
+        .status-grid {
+            display: grid;
+            grid-template-columns: 2fr 1fr 1fr;
+            gap: 20px;
+            margin-bottom: 30px;
+        }
+        
+        .card {
+            background: var(--light);
+            border-radius: 10px;
+            padding: 25px;
+            border-left: 5px solid var(--secondary);
+        }
+        
+        .temperature-card {
+            text-align: center;
+        }
+        
+        .temperature-display {
+            font-size: 64px;
+            font-weight: bold;
+            margin: 20px 0;
+            color: var(--dark);
+        }
+        
+        .status-indicator {
+            display: inline-block;
+            padding: 10px 25px;
+            border-radius: 25px;
+            font-weight: bold;
+            font-size: 18px;
+            margin-top: 10px;
+        }
+        
+        .status-normal {
+            background-color: rgba(39, 174, 96, 0.2);
+            color: var(--success);
+            border: 2px solid var(--success);
+        }
+        
+        .status-warning {
+            background-color: rgba(243, 156, 18, 0.2);
+            color: var(--warning);
+            border: 2px solid var(--warning);
+        }
+        
+        .status-critical {
+            background-color: rgba(231, 76, 60, 0.2);
+            color: var(--danger);
+            border: 2px solid var(--danger);
+        }
+        
+        .controls {
+            display: grid;
+            grid-template-columns: 1fr 1fr 1fr 1fr;
+            gap: 15px;
+            margin: 25px 0;
+        }
+        
+        button {
+            padding: 15px;
+            border: none;
+            border-radius: 8px;
+            font-size: 16px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+        
+        .btn-primary {
+            background: var(--secondary);
+            color: white;
+        }
+        
+        .btn-success {
+            background: var(--success);
+            color: white;
+        }
+        
+        .btn-warning {
+            background: var(--warning);
+            color: white;
+        }
+        
+        .btn-info {
+            background: #17a2b8;
+            color: white;
+        }
+        
+        button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+        }
+        
+        .btn-primary:hover { background: #2980b9; }
+        .btn-success:hover { background: #219653; }
+        .btn-warning:hover { background: #e67e22; }
+        .btn-info:hover { background: #138496; }
+        
+        .notification {
+            padding: 15px;
+            border-radius: 8px;
+            margin: 20px 0;
+            display: none;
+        }
+        
+        .notification-success {
+            background-color: rgba(39, 174, 96, 0.2);
+            border-left: 5px solid var(--success);
+            color: var(--success);
+        }
+        
+        .notification-error {
+            background-color: rgba(231, 76, 60, 0.2);
+            border-left: 5px solid var(--danger);
+            color: var(--danger);
+        }
+        
+        .loading {
+            display: none;
+            text-align: center;
+            margin: 20px 0;
+        }
+        
+        .spinner {
+            border: 5px solid rgba(52, 152, 219, 0.2);
+            border-top: 5px solid var(--secondary);
+            border-radius: 50%;
+            width: 50px;
+            height: 50px;
+            animation: spin 1s linear infinite;
+            margin: 0 auto 15px;
+        }
+        
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+        
+        .history-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 20px;
+        }
+        
+        .history-table th,
+        .history-table td {
+            padding: 12px;
+            text-align: left;
+            border-bottom: 1px solid #ddd;
+        }
+        
+        .history-table th {
+            background-color: var(--light);
+            font-weight: bold;
+        }
+        
+        .config-info {
+            background: #f8f9fa;
+            padding: 20px;
+            border-radius: 8px;
+            margin: 20px 0;
+        }
+        
+        @media (max-width: 768px) {
+            .status-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .controls {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>iDRAC Temperature Monitor</h1>
+            <p>Automated temperature monitoring and email alerts</p>
+        </div>
+        
+        <div class="content">
+            <div class="status-grid">
+                <div class="card temperature-card">
+                    <h2>Current Temperature</h2>
+                    <div class="temperature-display" id="temperature">-- °C</div>
+                    <div class="status-indicator" id="statusIndicator">UNKNOWN</div>
+                    <div id="lastUpdate" style="margin-top: 10px; color: #666; font-size: 14px;"></div>
+                </div>
+                
+                <div class="card">
+                    <h3>Thresholds</h3>
+                    <div style="margin-top: 15px;">
+                        <div style="display: flex; justify-content: space-between; margin: 10px 0;">
+                            <span>Normal:</span>
+                            <strong style="color: var(--success);">&lt; 27°C</strong>
+                        </div>
+                        <div style="display: flex; justify-content: space-between; margin: 10px 0;">
+                            <span>Warning:</span>
+                            <strong style="color: var(--warning);">≥ 27°C</strong>
+                        </div>
+                        <div style="display: flex; justify-content: space-between; margin: 10px 0;">
+                            <span>Critical:</span>
+                            <strong style="color: var(--danger);">≥ 30°C</strong>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="card">
+                    <h3>System Status</h3>
+                    <div style="margin-top: 15px;">
+                        <div style="display: flex; justify-content: space-between; margin: 10px 0;">
+                            <span>Monitoring:</span>
+                            <strong id="monitoringStatus" style="color: var(--success);">Active</strong>
+                        </div>
+                        <div style="display: flex; justify-content: space-between; margin: 10px 0;">
+                            <span>Interval:</span>
+                            <strong id="checkInterval">60 minutes</strong>
+                        </div>
+                        <div style="display: flex; justify-content: space-between; margin: 10px 0;">
+                            <span>Next Check:</span>
+                            <strong id="nextCheck">Calculating...</strong>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="controls">
+                <button class="btn-primary" onclick="getTemperature()">Get Temperature</button>
+                <button class="btn-success" onclick="sendReport()">Send Manual Report</button>
+                <button class="btn-warning" onclick="sendTestEmail()">Send Test Email</button>
+                <button class="btn-info" onclick="testEmailConnection()">Test Email Connection</button>
+            </div>
+            
+            <div class="loading" id="loading">
+                <div class="spinner"></div>
+                <p id="loadingText">Processing your request...</p>
+            </div>
+            
+            <div class="notification" id="notification"></div>
+            
+            <div class="config-info">
+                <h3>Configuration</h3>
+                <p><strong>iDRAC URL:</strong> https://10.129.16.81</p>
+                <p><strong>Email Alerts:</strong> supercompnxp@gmail.com</p>
+                <p><strong>Current Settings:</strong> <span id="currentSettings">Loading...</span></p>
+            </div>
+            
+            <div>
+                <h3>Temperature History (Last 24 readings)</h3>
+                <table class="history-table" id="historyTable">
+                    <thead>
+                        <tr>
+                            <th>Timestamp</th>
+                            <th>Temperature</th>
+                            <th>Status</th>
+                        </tr>
+                    </thead>
+                    <tbody id="historyBody">
+                        <tr>
+                            <td colspan="3" style="text-align: center;">No data available</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        let currentTemperature = null;
+        let currentStatus = 'UNKNOWN';
+        
+        // DOM Elements
+        const temperatureEl = document.getElementById('temperature');
+        const statusIndicatorEl = document.getElementById('statusIndicator');
+        const loadingEl = document.getElementById('loading');
+        const loadingTextEl = document.getElementById('loadingText');
+        const notificationEl = document.getElementById('notification');
+        const lastUpdateEl = document.getElementById('lastUpdate');
+        const monitoringStatusEl = document.getElementById('monitoringStatus');
+        const nextCheckEl = document.getElementById('nextCheck');
+        const historyBodyEl = document.getElementById('historyBody');
+        const checkIntervalEl = document.getElementById('checkInterval');
+        const currentSettingsEl = document.getElementById('currentSettings');
+        
+        // Function to show notification
+        function showNotification(message, type) {
+            notificationEl.textContent = message;
+            notificationEl.className = 'notification';
+            notificationEl.classList.add(`notification-${type}`);
+            notificationEl.style.display = 'block';
+            
+            setTimeout(() => {
+                notificationEl.style.display = 'none';
+            }, 5000);
+        }
+        
+        // Function to show/hide loading
+        function setLoading(show, text = 'Processing your request...') {
+            loadingTextEl.textContent = text;
+            loadingEl.style.display = show ? 'block' : 'none';
+        }
+        
+        // Function to update temperature display
+        function updateTemperatureDisplay(temperature, status, timestamp) {
+            currentTemperature = temperature;
+            currentStatus = status;
+            
+            temperatureEl.textContent = `${temperature} °C`;
+            
+            let statusClass = 'status-normal';
+            if (status === 'CRITICAL') {
+                statusClass = 'status-critical';
+            } else if (status === 'WARNING') {
+                statusClass = 'status-warning';
+            }
+            
+            statusIndicatorEl.textContent = status;
+            statusIndicatorEl.className = 'status-indicator ' + statusClass;
+            
+            if (timestamp) {
+                lastUpdateEl.textContent = `Last updated: ${new Date(timestamp).toLocaleString()}`;
+            }
+        }
+        
+        // API Functions
+        async function getTemperature() {
+            setLoading(true, 'Getting temperature from iDRAC...');
+            
+            try {
+                const response = await fetch('/api/temperature');
+                const data = await response.json();
+                
+                if (data.success) {
+                    updateTemperatureDisplay(data.temperature, data.status, data.timestamp);
+                    showNotification(`Temperature: ${data.temperature}°C - Status: ${data.status}`, 'success');
+                    loadHistory();
+                } else {
+                    showNotification(`Error: ${data.message}`, 'error');
+                }
+            } catch (error) {
+                showNotification(`Network error: ${error.message}`, 'error');
+            } finally {
+                setLoading(false);
+            }
+        }
+        
+        async function sendReport() {
+            setLoading(true, 'Sending manual report...');
+            
+            try {
+                const response = await fetch('/api/send-report', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    }
+                });
+                
+                const data = await response.json();
+                
+                if (data.success) {
+                    showNotification(data.message, 'success');
+                } else {
+                    showNotification(data.message, 'error');
+                }
+            } catch (error) {
+                showNotification(`Network error: ${error.message}`, 'error');
+            } finally {
+                setLoading(false);
+            }
+        }
+        
+        async function sendTestEmail() {
+            setLoading(true, 'Sending test email...');
+            
+            try {
+                const response = await fetch('/api/send-test-email', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    }
+                });
+                
+                const data = await response.json();
+                
+                if (data.success) {
+                    showNotification('Test email sent successfully! Check your inbox.', 'success');
+                } else {
+                    showNotification(`Failed to send test email: ${data.message}`, 'error');
+                }
+            } catch (error) {
+                showNotification(`Network error: ${error.message}`, 'error');
+            } finally {
+                setLoading(false);
+            }
+        }
+        
+        async function testEmailConnection() {
+            setLoading(true, 'Testing email connection...');
+            
+            try {
+                const response = await fetch('/api/test-email-connection', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    }
+                });
+                
+                const data = await response.json();
+                
+                if (data.success) {
+                    showNotification('Email connection test successful!', 'success');
+                } else {
+                    showNotification(`Email connection failed: ${data.message}`, 'error');
+                }
+            } catch (error) {
+                showNotification(`Test failed: ${error.message}`, 'error');
+            } finally {
+                setLoading(false);
+            }
+        }
+        
+        async function loadHistory() {
+            try {
+                const response = await fetch('/api/history');
+                const data = await response.json();
+                
+                if (data.history && data.history.length > 0) {
+                    historyBodyEl.innerHTML = data.history.map(reading => `
+                        <tr>
+                            <td>${new Date(reading.timestamp).toLocaleString()}</td>
+                            <td>${reading.temperature}°C</td>
+                            <td>
+                                <span class="status-indicator status-${reading.status.toLowerCase()}">
+                                    ${reading.status}
+                                </span>
+                            </td>
+                        </tr>
+                    `).join('');
+                }
+            } catch (error) {
+                console.error('Error loading history:', error);
+            }
+        }
+        
+        async function loadSystemStatus() {
+            try {
+                const response = await fetch('/api/status');
+                const data = await response.json();
+                
+                if (data.monitoring_active) {
+                    monitoringStatusEl.textContent = 'Active';
+                    monitoringStatusEl.style.color = 'var(--success)';
+                } else {
+                    monitoringStatusEl.textContent = 'Inactive';
+                    monitoringStatusEl.style.color = 'var(--danger)';
+                }
+                
+                // Update check interval
+                checkIntervalEl.textContent = `${data.check_interval} minutes`;
+                
+                // Update email settings
+                if (data.email_settings) {
+                    const settings = [];
+                    if (data.email_settings.send_warning_emails) settings.push('Warnings');
+                    if (data.email_settings.send_critical_emails) settings.push('Critical');
+                    if (data.email_settings.send_regular_reports) settings.push('Regular Reports');
+                    currentSettingsEl.textContent = settings.join(', ') || 'No email alerts';
+                }
+                
+                // Calculate next check time
+                if (data.last_check) {
+                    const lastCheck = new Date(data.last_check);
+                    const nextCheck = new Date(lastCheck.getTime() + data.check_interval * 60000);
+                    nextCheckEl.textContent = nextCheck.toLocaleString();
+                }
+            } catch (error) {
+                console.error('Error loading system status:', error);
+            }
+        }
+        
+        // Initialize
+        document.addEventListener('DOMContentLoaded', function() {
+            getTemperature();
+            loadHistory();
+            loadSystemStatus();
+            
+            // Refresh every 30 seconds
+            setInterval(() => {
+                loadSystemStatus();
+            }, 30000);
+            
+            // Auto-refresh temperature every 2 minutes
+            setInterval(() => {
+                if (!loadingEl.style.display || loadingEl.style.display === 'none') {
+                    getTemperature();
+                }
+            }, 120000);
+        });
+    </script>
+</body>
+</html>
