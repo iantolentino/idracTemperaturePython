@@ -81,8 +81,7 @@ This monitor operates as a background service.
 
 
 ## Actual Screenshots
-<img width="1338" height="478" alt="live-graph" src="https://github.com/user-attachments/assets/f7fdb635-8116-48cf-bfe8-eaa088c4d4d2" />
-<img width="1072" height="498" alt="live-and-history-logs" src="https://github.com/user-attachments/assets/50e3db1b-4ae7-4a72-ab16-13e3321ef7a6" />
-<img width="1066" height="424" alt="history-graph" src="https://github.com/user-attachments/assets/dcf846f4-e765-45c4-9695-b65b51f1a039" />
+
+<img width="1366" height="768" alt="pythonidrac" src="https://github.com/user-attachments/assets/25a24cc8-d895-4712-98ef-1ea460c5b35a" />
 
 
