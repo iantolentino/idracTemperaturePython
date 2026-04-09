@@ -31,7 +31,7 @@ This utility is currently utilized for infrastructure monitoring within **Nanox 
 The application uses a `.env` file for environment-specific variables. Ensure this file is present in the root directory.
 
 ### iDRAC Connection
-* `IDRAC_URL`: Full URL to the target iDRAC (e.g., `https://10.129.16.81`).
+* `IDRAC_URL`: Full URL to the target iDRAC (e.g., `https://192.168.0.0`).
 * `IDRAC_USER`: iDRAC username (default: `root`).
 * `IDRAC_PASS`: iDRAC password.
 
