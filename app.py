@@ -62,10 +62,10 @@ def _host_from_url(url: str) -> str:
 # =========================
 # Config
 # =========================
-IDRAC_URL  = os.getenv("IDRAC_URL", "https://10.129.16.81")
+IDRAC_URL  = os.getenv("IDRAC_URL", "your idract url here")
 IDRAC_HOST = os.getenv("IDRAC_HOST", _host_from_url(IDRAC_URL))
-IDRAC_USER = os.getenv("IDRAC_USER", "root")
-IDRAC_PASS = os.getenv("IDRAC_PASS", "P@ssw0rd3128!")
+IDRAC_USER = os.getenv("IDRAC_USER", "your username")
+IDRAC_PASS = os.getenv("IDRAC_PASS", "your password")
 
 # Temperature thresholds
 NORMAL_TEMP_MAX = float(os.getenv("NORMAL_TEMP_MAX", "24"))  # Below 25 is normal
@@ -80,7 +80,7 @@ PERSIST_EMAIL_EVERY_SEC = int(os.getenv("PERSIST_EMAIL_EVERY_SEC", "1800"))  # 3
 MAIL_FROM_ADDRESS = os.getenv("MAIL_FROM_ADDRESS", "noreply@j-display.com")
 MAIL_FROM_NAME    = os.getenv("MAIL_FROM_NAME", "iDRAC Monitor")
 EMAIL_TO          = [a.strip() for a in os.getenv("EMAIL_TO",
-                      "supercompnxp@gmail.com, ian.tolentino.bp@j-display.com, lecelannharvey.echavarre.bn@j-display.com, ferrerasroyce@gmail.com, raffy.santiago.rbs@gmail.com, wongjm@ymail.com"
+                      "Add your gmails here seperated by comma"
                    ).split(",") if a.strip()]
 
 MAIL_HOST      = os.getenv("MAIL_HOST", "mrelay.intra.j-display.com")
