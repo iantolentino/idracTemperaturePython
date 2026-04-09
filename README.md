@@ -1,4 +1,4 @@
-## iDRAC Temperature Monitor
+## iDRAC Temperature Monitor (Python)
 
 This utility is currently utilized for infrastructure monitoring within **Nanox Philippines Inc.** It provides real-time tracking of Dell iDRAC System Inlet temperatures using the Redfish API, ensuring the stability of critical server environments.
 
