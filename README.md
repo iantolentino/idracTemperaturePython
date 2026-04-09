@@ -72,7 +72,17 @@ The application uses a `.env` file for environment-specific variables. Ensure th
 
 This monitor operates as a background service. 
 
+
+
 1.  **Deployment:** Run the monitor using `python app.py`.
 2.  **Dashboard:** Access the internal web interface (default port 5000) to view current temperatures without logging into the iDRAC.
 3.  **Automated Notifications:** The system sends an "Hourly Report" for routine status updates and immediate "Alert" emails if server room conditions degrade.
 4.  **Persistent Monitoring:** In the event of a cooling failure, the system will re-alert every 30 minutes until the temperature returns to the Normal range.
+
+
+## Actual Screenshots
+<img width="1338" height="478" alt="live-graph" src="https://github.com/user-attachments/assets/f7fdb635-8116-48cf-bfe8-eaa088c4d4d2" />
+<img width="1072" height="498" alt="live-and-history-logs" src="https://github.com/user-attachments/assets/50e3db1b-4ae7-4a72-ab16-13e3321ef7a6" />
+<img width="1066" height="424" alt="history-graph" src="https://github.com/user-attachments/assets/dcf846f4-e765-45c4-9695-b65b51f1a039" />
+
+
