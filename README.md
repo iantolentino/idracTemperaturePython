@@ -47,7 +47,7 @@ The application uses a `.env` file for environment-specific variables. Ensure th
 ### SMTP Settings (Nanox Infrastructure)
 * `MAIL_HOST`: SMTP relay server address.
 * `MAIL_PORT`: SMTP port (default: `25`).
-* `MAIL_FROM_ADDRESS`: Sender address (e.g., `noreply@j-display.com`).
+* `MAIL_FROM_ADDRESS`: Sender address (e.g., `Example@gmail.com`).
 * `EMAIL_TO`: Comma-separated list of IT recipients.
 * `MAIL_ENCRYPTION`: Encryption method (`tls`, `ssl`, or blank).
 
