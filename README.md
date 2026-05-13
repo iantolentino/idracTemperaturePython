@@ -1,4 +1,4 @@
-# iDRAC Inlet Temperature Monitor
+# iDRAC Inlet Temperature Monitor 
 
 A **production‑ready, offline‑friendly iDRAC temperature monitoring system** with a modern web UI, combined email alerts, spike‑suppression logic, historical graphing, and per‑server log export.
 
@@ -12,7 +12,7 @@ Designed for **datacenter / lab environments** where:
 
 ## Key Features
 
-### Multi‑Server Monitoring
+### Multi‑Server Monitoring 
 
 *   Monitor **multiple Dell iDRAC endpoints** at once
 *   Same credentials supported across all servers
@@ -73,7 +73,7 @@ This mirrors real NOC / datacenter alert practice.
 
 ***
 
-## Project Structure
+## Project Structure 
 
 ```text
 .
@@ -95,7 +95,7 @@ This mirrors real NOC / datacenter alert practice.
 
 Example:
 
-```env
+```env 
 IDRAC_SERVERS=10.129.16.81,10.129.16.82,10.129.16.84
 IDRAC_USER=root
 IDRAC_PASS=yourpassword
@@ -114,7 +114,7 @@ MAIL_PORT=25
 
 ***
 
-## Web UI Overview
+## Web UI Overview 
 
 ### Temperature Cards (Top Priority)
 
